@@ -1,0 +1,49 @@
+name: 昆工研招网监控
+
+on:
+  # 定时运行，每15分钟检查一次
+  schedule:
+    - cron: '* 0 * * * *'
+  # 支持手动触发
+  workflow_dispatch:
+  # 代码推送时运行
+  push:
+    branches:
+      - main
+
+# 设置环境变量
+env:
+  PYTHON_VERSION: '3.10'
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      # 检出代码
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      # 设置Python环境
+      - name: 设置Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: 'pip'
+
+      # 安装依赖
+      - name: 安装依赖
+        run: |
+          pip install -r requirements.txt
+
+      # 运行监控脚本
+      - name: 运行监控
+        env:
+          # 从Secrets获取飞书Webhook
+          FEISHU_WEBHOOK: ${{ secrets.FEISHU_WEBHOOK }}
+          # 可选配置
+          CHECK_INTERVAL: ${{ secrets.CHECK_INTERVAL || '300' }}
+          MAX_ITEMS: ${{ secrets.MAX_ITEMS || '10' }}
+        run: |
+          python main.py
