@@ -3,7 +3,7 @@ name: 昆工研招网监控
 on:
   # 定时运行，每15分钟检查一次
   schedule:
-    - cron: '* 0 * * * *'
+    - cron: '0 * * * *'
   # 支持手动触发
   workflow_dispatch:
   # 代码推送时运行
